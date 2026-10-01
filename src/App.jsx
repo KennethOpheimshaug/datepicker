@@ -100,11 +100,51 @@ function EvasiveNo() {
 function Question1({ onYes }) {
   const [noCount, setNoCount] = useState(0)
   const [celebrate, setCelebrate] = useState(false)
+  const yesRef = useRef(null)
+  const yx = useMotionValue(0)
+  const yy = useMotionValue(0)
+  const ys = useMotionValue(1)
+  const yr = useMotionValue(0)
 
   const yes = () => {
     setCelebrate(true)
     setTimeout(onYes, 1800)
   }
+
+  useEffect(() => {
+    if (noCount === 1) {
+      const c = animate(ys, 1.5, { type: 'spring' })
+      return () => c.stop()
+    }
+    if (noCount < 2) return
+    // «Ja» vokser 50 % til, rister, flyttes til midten og vokser gradvis til 40 % av skjermen
+    let stopped = false
+    const running = []
+    const run = async () => {
+      const el = yesRef.current
+      if (!el) return
+      await animate(ys, 2.25, { type: 'spring' })
+      if (stopped) return
+      await animate(yr, [0, -10, 10, -8, 8, -5, 5, 0], { duration: 0.7 })
+      if (stopped) return
+      const vw = document.documentElement.clientWidth
+      const vh = document.documentElement.clientHeight
+      const r = el.getBoundingClientRect()
+      const baseCx = r.left + r.width / 2 - yx.get()
+      const baseCy = r.top + r.height / 2 - yy.get()
+      const target = Math.max(2.25, (0.4 * vw) / el.offsetWidth)
+      running.push(
+        animate(yx, vw / 2 - baseCx, { duration: 1.2, ease: 'easeInOut' }),
+        animate(yy, vh / 2 - baseCy, { duration: 1.2, ease: 'easeInOut' }),
+        animate(ys, target, { duration: 5, ease: 'easeOut' }),
+      )
+    }
+    run()
+    return () => {
+      stopped = true
+      running.forEach((c) => c.stop())
+    }
+  }, [noCount, ys, yr, yx, yy])
 
   if (celebrate)
     return (
@@ -118,7 +158,7 @@ function Question1({ onYes }) {
     <>
       <h1 className="script">Vil du gå på date med meg?</h1>
       <div className="buttons yesno">
-        <motion.button className="btn primary" onClick={yes} animate={{ scale: noCount === 0 ? 1 : noCount === 1 ? 1.5 : 2.25 }}>
+        <motion.button ref={yesRef} className="btn primary yes" onClick={yes} style={{ x: yx, y: yy, scale: ys, rotate: yr }}>
           Ja 💕
         </motion.button>
         {noCount < 2 ? (
