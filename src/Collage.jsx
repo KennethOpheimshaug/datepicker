@@ -29,7 +29,7 @@ export default function Collage() {
               width: `${p.s}vmin`,
               height: `${p.s * 1.2}vmin`,
               transform: `rotate(${p.r}deg)`,
-              background: src ? `center / cover url(${src})` : TINTS[i % TINTS.length],
+              background: src ? `center 30% / cover url(${src})` : TINTS[i % TINTS.length],
               animationDelay: `${(i % 4) * 0.5}s`,
             }}
           >
