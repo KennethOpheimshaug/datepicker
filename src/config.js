@@ -12,3 +12,6 @@ export const OPTIONS = [
   { id: 'aktivitet', emoji: '🎳', label: 'Aktivitet', hint: 'bowling, museum, minigolf', phrase: 'en aktivitet' },
   { id: 'puslespill', emoji: '🕯️', label: 'Puslespill hjemme med levende lys', phrase: 'puslespill hjemme' },
 ]
+
+// Christina Perri – A Thousand Years (offisiell musikkvideo på YouTube)
+export const MUSIC_YOUTUBE_ID = 'rtOvBOTyX00'

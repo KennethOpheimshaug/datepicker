@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import Collage from './Collage'
 import TimeWheel from './TimeWheel'
+import Music from './Music'
 import { OPTIONS, EMAIL_TO } from './config'
 
 const slide = {
@@ -256,6 +257,7 @@ export default function App() {
   return (
     <>
       <Collage />
+      <Music />
       <main className="stage">
         <AnimatePresence mode="wait">
           <motion.section key={step} className="card" {...slide}>
