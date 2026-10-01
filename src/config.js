@@ -4,7 +4,7 @@ export const EMAIL_TO = 'kennetholsen87@gmail.com'
 // Bildene ligger i public/images (nedskalert fra originalene i /bilder).
 // Rekkefølgen følger plasseringene i LAYOUT i Collage.jsx. Null = rosa placeholder.
 const img = (n) => `${import.meta.env.BASE_URL}images/${n}.jpg`
-export const COLLAGE_IMAGES = [1, 5, 3, 2, 6, 4, 2, 5].map(img)
+export const COLLAGE_IMAGES = [1, 7, 4, 2, 8, 3, 5, 6].map(img)
 
 export const OPTIONS = [
   { id: 'kino', emoji: '🎬', label: 'Kino', phrase: 'kino' },
