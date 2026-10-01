@@ -30,7 +30,8 @@ body {
 
 /* Knapper */
 .buttons { display: flex; gap: 14px; justify-content: center; align-items: center; flex-wrap: wrap; margin-top: 1.4rem; }
-.yesno { min-height: 110px; }
+.yesno { min-height: 150px; }
+.evasive { position: relative; z-index: 5; }
 .btn { font: inherit; font-weight: 600; font-size: 1.1rem; border: 0; border-radius: 999px; padding: 12px 28px; cursor: pointer; transition: background .2s; }
 .btn.primary { background: var(--rose); color: #fff; box-shadow: 0 6px 16px #e0527a55; }
 .btn.primary:hover:not(:disabled) { background: var(--rose-dark); }

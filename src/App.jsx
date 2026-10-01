@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { useState, useRef, useEffect } from 'react'
+import { AnimatePresence, animate, motion, useMotionValue } from 'framer-motion'
 import Collage from './Collage'
 import TimeWheel from './TimeWheel'
 import Music from './Music'
@@ -34,6 +34,69 @@ function Hearts() {
   )
 }
 
+// «Nei»-knappen som aktivt flytter seg bort fra pekeren
+function EvasiveNo() {
+  const ref = useRef(null)
+  const x = useMotionValue(0)
+  const y = useMotionValue(0)
+
+  useEffect(() => {
+    const dodge = (e) => {
+      const el = ref.current
+      const vw = document.documentElement.clientWidth
+      const vh = document.documentElement.clientHeight
+      if (!el || !vw || !vh) return
+      const r = el.getBoundingClientRect()
+      const cx = r.left + r.width / 2
+      const cy = r.top + r.height / 2
+      const dx = cx - e.clientX
+      const dy = cy - e.clientY
+      const dist = Math.hypot(dx, dy)
+      const reach = Math.max(r.width, r.height) / 2 + 70
+      if (dist > reach) return
+
+      const margin = 16
+      const step = 180
+      const ux = dist < 1 ? 1 : dx / dist
+      const uy = dist < 1 ? 0 : dy / dist
+      let tx = cx + ux * step
+      let ty = cy + uy * step
+      const inside = (x, y) =>
+        x - r.width / 2 > margin && x + r.width / 2 < vw - margin && y - r.height / 2 > margin && y + r.height / 2 < vh - margin
+      if (!inside(tx, ty)) {
+        // havnet i et hjørne: hopp til et tilfeldig sted et godt stykke unna pekeren
+        for (let i = 0; i < 20; i++) {
+          tx = margin + r.width / 2 + Math.random() * (vw - r.width - 2 * margin)
+          ty = margin + r.height / 2 + Math.random() * (vh - r.height - 2 * margin)
+          if (Math.hypot(tx - e.clientX, ty - e.clientY) > 200) break
+        }
+      }
+      // r er inkludert dagens forskyvning, så trekk den fra for å få målet i x/y
+      const to = { type: 'spring', stiffness: 260, damping: 18 }
+      animate(x, x.get() + tx - cx, to)
+      animate(y, y.get() + ty - cy, to)
+    }
+    window.addEventListener('pointermove', dodge)
+    window.addEventListener('pointerdown', dodge) // berøringsskjerm
+    return () => {
+      window.removeEventListener('pointermove', dodge)
+      window.removeEventListener('pointerdown', dodge)
+    }
+  }, [])
+
+  return (
+    <motion.button
+      ref={ref}
+      className="btn ghost evasive"
+      initial={{ scale: 0.5 }}
+      animate={{ scale: 0.5 }}
+      style={{ x, y }}
+    >
+      Nei
+    </motion.button>
+  )
+}
+
 function Question1({ onYes }) {
   const [noCount, setNoCount] = useState(0)
   const [celebrate, setCelebrate] = useState(false)
@@ -55,22 +118,16 @@ function Question1({ onYes }) {
     <>
       <h1 className="script">Vil du gå på date med meg?</h1>
       <div className="buttons yesno">
-        <motion.button className="btn primary" onClick={yes} animate={{ scale: noCount === 0 ? 1 : noCount === 1 ? 1.5 : 1.8 }}>
+        <motion.button className="btn primary" onClick={yes} animate={{ scale: noCount === 0 ? 1 : noCount === 1 ? 1.5 : 2.25 }}>
           Ja 💕
         </motion.button>
-        <AnimatePresence>
-          {noCount < 2 && (
-            <motion.button
-              key="no"
-              className="btn ghost"
-              onClick={() => setNoCount((n) => n + 1)}
-              animate={{ scale: noCount === 0 ? 1 : 0.5 }}
-              exit={{ x: 700, y: -500, rotate: 720, opacity: 0, scale: 0.2, transition: { duration: 0.9, ease: 'easeIn' } }}
-            >
-              Nei
-            </motion.button>
-          )}
-        </AnimatePresence>
+        {noCount < 2 ? (
+          <motion.button className="btn ghost" onClick={() => setNoCount((n) => n + 1)} animate={{ scale: noCount === 0 ? 1 : 0.5 }}>
+            Nei
+          </motion.button>
+        ) : (
+          <EvasiveNo />
+        )}
       </div>
       {noCount === 1 && <p className="hint">Er du helt sikker? 🥺</p>}
     </>
