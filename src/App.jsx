@@ -169,7 +169,7 @@ function Question1({ onYes }) {
           <EvasiveNo />
         )}
       </div>
-      {noCount === 1 && <p className="hint">Er du helt sikker? 🥺</p>}
+      {noCount === 1 && <p className="hint">🥺</p>}
     </>
   )
 }
@@ -279,7 +279,7 @@ function Question4({ a, setA, onConfirm, status }) {
   const [editing, setEditing] = useState(false)
   return (
     <>
-      <h1 className="script">Ser dette riktig ut?</h1>
+      <h1 className="script">Ser dette bra ut?</h1>
       <Summary a={a} />
       <div className="buttons">
         <button className="btn primary" onClick={onConfirm} disabled={status === 'sending'}>
@@ -312,7 +312,7 @@ function Done({ a }) {
       <Hearts />
       <h1 className="script big">Det blir fint! 💌</h1>
       <Summary a={a} />
-      <p className="hint">Svaret ditt er sendt – gleder meg!</p>
+      <p className="hint">Gleder meg!</p>
     </div>
   )
 }
