@@ -14,10 +14,24 @@ const LAYOUT = [
   { x: 74, y: 70, s: 28, r: 8 },
 ]
 
+// Stående skjerm (mobil): tiles langs topp og bunn så kortet i midten står fritt
+const LAYOUT_PORTRAIT = [
+  { x: 3, y: 2, s: 36, r: -6 },
+  { x: 56, y: 1, s: 34, r: 0 },
+  { x: -4, y: 27, s: 28, r: 5 },
+  { x: 74, y: 30, s: 28, r: -5 },
+  { x: 2, y: 68, s: 30, r: 0 },
+  { x: 36, y: 76, s: 34, r: 6 },
+  { x: 68, y: 66, s: 32, r: -6 },
+  { x: 12, y: 86, s: 28, r: -4 },
+]
+
 export default function Collage() {
+  const portrait = typeof window !== 'undefined' && window.matchMedia('(max-aspect-ratio: 1/1)').matches
+  const layout = portrait ? LAYOUT_PORTRAIT : LAYOUT
   return (
     <div className="collage" aria-hidden="true">
-      {LAYOUT.map((p, i) => {
+      {layout.map((p, i) => {
         const src = COLLAGE_IMAGES[i]
         return (
           <div

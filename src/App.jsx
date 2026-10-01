@@ -17,6 +17,8 @@ const prettyDate = (iso) => {
   const s = new Date(iso + 'T12:00:00').toLocaleDateString('nb-NO', { weekday: 'long', day: 'numeric', month: 'long' })
   return s.charAt(0).toUpperCase() + s.slice(1)
 }
+// Mobil/berøringsskjerm: ingen musepeker å unnvike, så «Nei» hopper rundt av seg selv
+const isTouchLike = () => window.matchMedia('(pointer: coarse), (max-width: 640px)').matches
 const findOpt = (id) => OPTIONS.find((o) => o.id === id)
 
 function Hearts() {
@@ -76,11 +78,26 @@ function EvasiveNo() {
       animate(x, x.get() + tx - cx, to)
       animate(y, y.get() + ty - cy, to)
     }
+    const hop = () => {
+      const el = ref.current
+      const vw = document.documentElement.clientWidth
+      const vh = document.documentElement.clientHeight
+      if (!el || !vw || !vh) return
+      const r = el.getBoundingClientRect()
+      const margin = 12
+      const tx = margin + r.width / 2 + Math.random() * (vw - r.width - 2 * margin)
+      const ty = margin + r.height / 2 + Math.random() * (vh - r.height - 2 * margin)
+      const to = { type: 'spring', stiffness: 380, damping: 22 }
+      animate(x, x.get() + tx - (r.left + r.width / 2), to)
+      animate(y, y.get() + ty - (r.top + r.height / 2), to)
+    }
     window.addEventListener('pointermove', dodge)
     window.addEventListener('pointerdown', dodge) // berøringsskjerm
+    const timer = isTouchLike() ? setInterval(hop, 650) : null
     return () => {
       window.removeEventListener('pointermove', dodge)
       window.removeEventListener('pointerdown', dodge)
+      clearInterval(timer)
     }
   }, [])
 
@@ -117,27 +134,32 @@ function Question1({ onYes }) {
       return () => c.stop()
     }
     if (noCount < 2) return
-    // «Ja» vokser 50 % til, rister, flyttes til midten og vokser gradvis til 40 % av skjermen
+    // «Ja» vokser 50 % til, rister, flyttes til midten og vokser gradvis til 40 % av skjermen.
+    // På mobil rister den hele tiden mens den vokser (og fyller mer av skjermen).
     let stopped = false
     const running = []
+    const touch = isTouchLike()
     const run = async () => {
       const el = yesRef.current
       if (!el) return
       await animate(ys, 2.25, { type: 'spring' })
       if (stopped) return
-      await animate(yr, [0, -10, 10, -8, 8, -5, 5, 0], { duration: 0.7 })
-      if (stopped) return
+      if (!touch) {
+        await animate(yr, [0, -10, 10, -8, 8, -5, 5, 0], { duration: 0.7 })
+        if (stopped) return
+      }
       const vw = document.documentElement.clientWidth
       const vh = document.documentElement.clientHeight
       const r = el.getBoundingClientRect()
       const baseCx = r.left + r.width / 2 - yx.get()
       const baseCy = r.top + r.height / 2 - yy.get()
-      const target = Math.max(2.25, (0.4 * vw) / el.offsetWidth)
+      const target = Math.max(2.25, ((touch ? 0.7 : 0.4) * vw) / el.offsetWidth)
       running.push(
         animate(yx, vw / 2 - baseCx, { duration: 1.2, ease: 'easeInOut' }),
         animate(yy, vh / 2 - baseCy, { duration: 1.2, ease: 'easeInOut' }),
         animate(ys, target, { duration: 5, ease: 'easeOut' }),
       )
+      if (touch) running.push(animate(yr, [0, -7, 7, -7, 7, 0], { duration: 0.45, repeat: Infinity }))
     }
     run()
     return () => {
