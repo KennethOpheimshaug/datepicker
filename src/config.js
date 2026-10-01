@@ -15,3 +15,6 @@ export const OPTIONS = [
 
 // Christina Perri – A Thousand Years (offisiell musikkvideo på YouTube)
 export const MUSIC_YOUTUBE_ID = 'rtOvBOTyX00'
+
+// Volum 0-100 (YouTube-standard er 100)
+export const MUSIC_VOLUME = 40

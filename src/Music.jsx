@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { MUSIC_YOUTUBE_ID } from './config'
+import { MUSIC_YOUTUBE_ID, MUSIC_VOLUME } from './config'
 
 // Spiller sangen via innebygd YouTube-spiller (skjult). Nettlesere blokkerer lyd før brukeren
 // har klikket, så musikken starter ved første klikk hvor som helst på siden.
@@ -14,7 +14,10 @@ export default function Music() {
         videoId: MUSIC_YOUTUBE_ID,
         playerVars: { playsinline: 1, loop: 1, playlist: MUSIC_YOUTUBE_ID, controls: 0 },
         events: {
-          onReady: () => setReady(true),
+          onReady: (e) => {
+            e.target.setVolume(MUSIC_VOLUME)
+            setReady(true)
+          },
           onStateChange: (e) => setPlaying(e.data === window.YT.PlayerState.PLAYING),
         },
       })
